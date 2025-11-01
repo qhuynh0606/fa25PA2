@@ -25,23 +25,12 @@ void encodeMessage(const string& filename, string codes[]);
 
 int main() {
     int freq[26] = {0};
-
-    // Step 1: Read file and count letter frequencies
     buildFrequencyTable(freq, "input.txt");
-
-    // Step 2: Create leaf nodes for each character with nonzero frequency
     int nextFree = createLeafNodes(freq);
-
-    // Step 3: Build encoding tree using your heap
     int root = buildEncodingTree(nextFree);
-
-    // Step 4: Generate binary codes using an STL stack
     string codes[26];
     generateCodes(root, codes);
-
-    // Step 5: Encode the message and print output
     encodeMessage("input.txt", codes);
-
     return 0;
 }
 

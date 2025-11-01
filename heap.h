@@ -12,17 +12,19 @@ struct MinHeap {
     int data[64];
     int size;
 
+    // Implements min heap to store nodes. Used to extract the smallest weight nodes
     MinHeap() { size = 0; }
 
+    // insert index at end of heap, restore order using upheap()
+    // organized by weight from weightArr[]
     void push(int idx, int weightArr[]) {
-        // TODO: insert index at end of heap, restore order using upheap()
         int pos = size;
         data[size++] = idx;
 
         while (pos > 0) {
-            int parent = (pos - 1)/2;
-            if (weightArr[pos] < weightArr[parent]) {
-                swap(data[pos], data[parent]);
+            int parent = (pos - 1) / 2;
+            if (weightArr[data[pos]] < weightArr[data[parent]]) {
+                std::swap(data[pos], data[parent]);
                 pos = parent;
             } else {
                 break;
@@ -30,44 +32,77 @@ struct MinHeap {
         }
     }
 
+    // remove and return smallest index
+    // Replace root with last element, then call downheap()
+    // after removal, heap property restored by bubbling down
     int pop(int weightArr[]) {
-        // TODO: remove and return smallest index
-        // Replace root with last element, then call downheap()
         if (size == 0) {
             return -1;
         }
 
         int root = data[0];
+
+        data[0] = data[size - 1];
         size--;
 
         int pos = 0;
         while (true) {
-            int left = 2*pos + 1;
-            int right = 2*pos+2;
-            int minIdx = pos;
+            int left  = 2 * pos + 1;
+            int right = 2 * pos + 2;
+            int smallest = pos;
 
-            if (left < size && weightArr[left] < weightArr[minIdx]) {
-                minIdx = left;
+            if (left < size && weightArr[data[left]] < weightArr[data[smallest]]) {
+                smallest = left;
             }
-            if (right < size && weightArr[right] < weightArr[minIdx]) {
-                minIdx = right;
+            if (right < size && weightArr[data[right]] < weightArr[data[smallest]]) {
+                smallest = right;
             }
-            if (minIdx != pos) {
-                swap(data[pos], data[minIdx]);
-                pos = minIdx;
+            if (smallest != pos) {
+                std::swap(data[pos], data[smallest]);
+                pos = smallest;
             } else {
                 break;
             }
         }
-        return root; // placeholder
+        return root;
     }
 
+    // swap child upward while smaller than parent until heap property restored
+    // usually called after inserting new node
     void upheap(int pos, int weightArr[]) {
-        // TODO: swap child upward while smaller than parent
+        while (pos > 0) {
+            int parent = (pos - 1) / 2;
+            if (weightArr[data[pos]] < weightArr[data[parent]]) {
+                std::swap(data[pos], data[parent]);
+                pos = parent;
+            } else {
+                break;
+            }
+        }
     }
 
+    // swap parent downward while larger than any child
+    // usually called after removing element
     void downheap(int pos, int weightArr[]) {
-        // TODO: swap parent downward while larger than any child
+        while (true) {
+            int left = 2 * pos + 1;
+            int right = 2 * pos + 2;
+            int smallest = pos;
+
+            if (left < size && weightArr[data[left]] < weightArr[data[smallest]]) {
+                smallest = left;
+            }
+            if (right < size && weightArr[data[right]] < weightArr[data[smallest]]) {
+                smallest = right;
+            }
+
+            if (smallest != pos) {
+                std::swap(data[pos], data[smallest]);
+                pos = smallest;
+            } else {
+                break;
+            }
+        }
     }
 };
 
