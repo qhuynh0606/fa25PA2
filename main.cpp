@@ -78,44 +78,81 @@ int createLeafNodes(int freq[]) {
 }
 
 // Step 3: Build the encoding tree using heap operations
+// 1. Create a MinHeap object.
+// 2. Pushes all leaf node indices into the heap.
+// 3. While the heap size is greater than 1:
+//      - Pop two smallest nodes
+//      - Create a new parent node with combined weight
+//      - Set left/right pointers
+//      - Push new parent index back into the heap
+// 4. Return the index of the last remaining node (root)
+
 int buildEncodingTree(int nextFree) {
-    // 1. Create a MinHeap object.
+
     MinHeap h;
-    // 2. Push all leaf node indices into the heap.
+
     for (int i = 0; i < nextFree; ++i) {
         h.push(i, weightArr);
     }
     // next free slot for new parent nodes
     int nextIndex = nextFree;
-    // 3. While the heap size is greater than 1:
     while (h.size > 1) {
-        // - Pop two smallest nodes
         int pop1 = h.pop(weightArr); // popped smallest
         int pop2 = h.pop(weightArr); // popped second smallest
 
-        // - Create a new parent node with combined weight
         charArr[nextIndex] = '\0';  // internal node
         weightArr[nextIndex] = weightArr[pop1] + weightArr[pop2];
 
-        // - Set left/right pointers
         leftArr[nextIndex] = pop1;
         rightArr[nextIndex] = pop2;
 
-        // - Push new parent index back into the heap
         h.push(nextIndex, weightArr);
         nextIndex++;
     }
-    // 4. Return the index of the last remaining node (root)
     int root = (h.size == 1) ? h.pop(weightArr) : -1;
     return root;
 }
 
 // Step 4: Use an STL stack to generate codes
+// Uses stack<pair<int, string>> to simulate DFS traversal.
+// Left edge adds '0', right edge adds '1'.
+// Record code when a leaf node is reached.
 void generateCodes(int root, string codes[]) {
-    // TODO:
-    // Use stack<pair<int, string>> to simulate DFS traversal.
-    // Left edge adds '0', right edge adds '1'.
-    // Record code when a leaf node is reached.
+    // empty codes
+    for (int i = 0; i < 26; ++i) {
+        codes[i] = "";
+    }
+
+    if (root < 0) {
+        return;
+    }
+
+    stack<pair<int, string>> stk;
+    stk.push(make_pair(root, "")); // start root with empty code
+
+    while (!stk.empty()) {
+        pair<int, string> curr = stk.top();
+        stk.pop();
+
+        int node = curr.first;
+        string code = curr.second;
+
+        // check if leaf
+        if (leftArr[node] != -1 && rightArr[node] != -1) {
+            char ch = charArr[node];
+            if (ch >= 'A' && ch <= 'Z') {
+                codes[ch - 'a'] = code;
+            }
+        } else {
+            // go right -> left
+            if (rightArr[node] != -1) {
+                stk.push(make_pair(rightArr[node], code + '1'));
+            }
+            if (leftArr[node] != -1) {
+                stk.push(make_pair(leftArr[node], code + '2'));
+            }
+        }
+    }
 }
 
 // Step 5: Print table and encoded message
