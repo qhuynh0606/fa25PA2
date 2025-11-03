@@ -45,7 +45,6 @@ void buildFrequencyTable(int freq[], const string& filename) {
         cerr << "Error: could not open " << filename << "\n";
         exit(1);
     }
-
     char ch;
     while (file.get(ch)) {
         // Convert uppercase to lowercase
@@ -120,7 +119,7 @@ int buildEncodingTree(int nextFree) {
 void generateCodes(int root, string codes[]) {
     // empty codes
     for (int i = 0; i < 26; ++i) {
-        codes[i] = "";
+        codes[i].clear();
     }
 
     if (root < 0) {
@@ -138,18 +137,18 @@ void generateCodes(int root, string codes[]) {
         string code = curr.second;
 
         // check if leaf
-        if (leftArr[node] != -1 && rightArr[node] != -1) {
+        if (leftArr[node] == -1 && rightArr[node] == -1) {
             char ch = charArr[node];
-            if (ch >= 'A' && ch <= 'Z') {
+            if (ch >= 'a' && ch <= 'z') {
                 codes[ch - 'a'] = code;
             }
         } else {
             // go right -> left
             if (rightArr[node] != -1) {
-                stk.push(make_pair(rightArr[node], code + '1'));
+                stk.push(make_pair(rightArr[node], code + "1"));
             }
             if (leftArr[node] != -1) {
-                stk.push(make_pair(leftArr[node], code + '2'));
+                stk.push(make_pair(leftArr[node], code + '0'));
             }
         }
     }
